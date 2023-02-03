@@ -15,6 +15,22 @@ Import it in your code:
 import "github.com/egorgasay/dockerdb"
 ```
 
+The first launch should look like this:
+```go
+vdb, err := dockerdb.New(ctx, config)
+if err != nil {
+  log.Fatal(err)
+}
+```
+
+If the database was turned off, then you can turn it on using:
+```go
+err := vdb.Run(ctx, config)
+if err != nil {
+  log.Fatal(err)
+}
+```
+
 # Example 
 ```go
 import(
@@ -63,20 +79,3 @@ func main() {
 }
 ```
 
-# Description
-
-The first launch should look like this:
-```go
-vdb, err := dockerdb.New(ctx, config)
-if err != nil {
-  log.Fatal(err)
-}
-```
-
-If the database was turned off, then you can turn it on using:
-```go
-err := vdb.Run(ctx, config)
-if err != nil {
-  log.Fatal(err)
-}
-```
