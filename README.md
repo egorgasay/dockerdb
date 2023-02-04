@@ -25,7 +25,7 @@ if err != nil {
 
 If the database was turned off, then you can turn it on using:
 ```go
-err := vdb.Run(ctx, config)
+err := vdb.Run(ctx)
 if err != nil {
   log.Fatal(err)
 }
@@ -58,12 +58,6 @@ func main() {
   
   ctx := context.TODO()
   vdb, err := dockerdb.New(ctx, config)
-  if err != nil {
-    log.Fatal(err)
-  }
-  
-  ctx = context.TODO()
-  err = vdb.Run(ctx)
   if err != nil {
     log.Fatal(err)
   }
