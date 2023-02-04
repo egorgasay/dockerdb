@@ -1,8 +1,14 @@
 # dockerdb
-
 [![PkgGoDev](https://pkg.go.dev/badge/golang.org/x/mod)](https://pkg.go.dev/golang.org/x/mod)
 
 This repository contains a package for fast database deployment in Docker container.
+
+# Supported Vendors
+<ol>
+<li>PosgreSQL</li>
+<li>MySQL</li>
+</ol>
+More vendors soon...
 
 # Usage
 Download and install it:
@@ -33,7 +39,7 @@ if err != nil {
 
 # Example 
 ```go
-import(
+import (
   "context"
   "dockerdb"
   "fmt"
