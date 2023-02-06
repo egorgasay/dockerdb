@@ -4,36 +4,28 @@ import (
 	"context"
 	"dockerdb"
 	"fmt"
-	"log"
-	"math/rand"
-	"strconv"
-	"time"
-
+	_ "github.com/denisenkom/go-mssqldb"
+	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
+	"log"
 )
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
-	i := strconv.Itoa(rand.Int())
-
 	config := dockerdb.CustomDB{
 		DB: dockerdb.DB{
-			Name:     "test" + i,
+			Name:     "test",
 			User:     "admin",
 			Password: "test",
 		},
-		Port:   "37053",
-		Vendor: "postgres",
+		Port: "35231",
+		Vendor: dockerdb.Vendor{
+			Name:  dockerdb.Postgres,
+			Image: dockerdb.PostgresImage,
+		},
 	}
 
 	ctx := context.TODO()
 	vdb, err := dockerdb.New(ctx, config)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	ctx = context.TODO()
-	err = vdb.Run(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -45,4 +37,10 @@ func main() {
 	}
 
 	fmt.Println(answer)
+
+	if err = vdb.Stop(ctx); err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("db is down")
 }

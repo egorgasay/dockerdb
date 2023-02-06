@@ -12,6 +12,15 @@ import (
 const (
 	maxWaitTime = 20 * time.Second
 	tryInterval = 1 * time.Second
+
+	//MSSQL      = "mssql"
+	//MSSQLImage = "mcr.microsoft.com/mssql/server"
+
+	Postgres      = "postgres"
+	PostgresImage = "postgres"
+
+	MySQL      = "mysql"
+	MySQLImage = "mysql"
 )
 
 var (
@@ -33,12 +42,18 @@ type DB struct {
 	Password string
 }
 
+type Vendor struct {
+	Name  string
+	Image string
+}
+
 type CustomDB struct {
 	DB     DB
 	Port   string
-	Vendor string
+	Vendor Vendor
 }
 
+// New creates a new docker container and launches it
 func New(ctx context.Context, conf CustomDB) (*VDB, error) {
 	cli, err := client.NewClientWithOpts(client.FromEnv,
 		client.WithAPIVersionNegotiation())
@@ -47,14 +62,10 @@ func New(ctx context.Context, conf CustomDB) (*VDB, error) {
 	}
 
 	ddb := &VDB{cli: cli, conf: conf}
-	err = ddb.pull(ctx, ddb.conf.Vendor)
-	if err != nil {
-		return nil, err
-	}
 
 	err = ddb.init(ctx)
 	if err != nil {
-		return nil, err
+		return ddb, err
 	}
 
 	return ddb, nil

@@ -7,13 +7,16 @@ import (
 	"log"
 )
 
-var SupportedVendors = []string{
+var supportedVendors = []string{
 	"postgres",
 	"mysql",
+	"mcr.microsoft.com/mssql/server",
 }
 
-func (ddb *VDB) pull(ctx context.Context, vendor string) error {
-	if !ddb.contains(SupportedVendors, vendor) {
+// Pull pulls an image from net.
+// WARNING!! USE IT CAREFULLY! DOWNLOADING SOME DB IMAGES MAY TAKE SOME TIME
+func (ddb *VDB) Pull(ctx context.Context, vendor string) error {
+	if !ddb.contains(supportedVendors, vendor) {
 		return ErrUnsupportedVendor
 	}
 
