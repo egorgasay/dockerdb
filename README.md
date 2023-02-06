@@ -58,8 +58,11 @@ func main() {
       User:     "admin",
       Password: "test",
     },
-    Port:   "37053",
-    Vendor: "postgres",
+    Port: "35231",
+    Vendor: dockerdb.Vendor{
+      Name:  dockerdb.Postgres,
+      Image: dockerdb.PostgresImage,
+    },
   }
   
   ctx := context.TODO()
