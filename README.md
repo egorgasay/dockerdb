@@ -74,8 +74,12 @@ func main() {
   if err != nil {
     log.Fatal(err)
   }
-  
+
   fmt.Println(answer)
+
+  if err = vdb.Stop(ctx); err != nil {
+    log.Fatal(err)
+  }
 }
 ```
 
