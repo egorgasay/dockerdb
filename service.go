@@ -5,7 +5,9 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
+	"strings"
 	"time"
 )
 
@@ -62,6 +64,29 @@ func New(ctx context.Context, conf CustomDB) (*VDB, error) {
 	}
 
 	ddb := &VDB{cli: cli, conf: conf}
+	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+inner:
+	for _, container := range containers {
+		for _, name := range container.Names {
+			if strings.Trim(name, "/") == conf.DB.Name {
+				ddb.ID = container.ID
+				break inner
+			}
+		}
+	}
+
+	if ddb.ID != "" {
+		err = ddb.setup(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		return ddb, nil
+	}
 
 	err = ddb.init(ctx)
 	if err != nil {

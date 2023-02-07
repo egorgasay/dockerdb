@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/go-connections/nat"
+	"strings"
 )
 
 // init initializes the docker container with the selected database
@@ -52,7 +53,13 @@ func (ddb *VDB) init(ctx context.Context) error {
 		//Cmd:   []string{"sh", "-c", "while true; do sleep 10; done"},
 	}, hostConfig, nil, nil, containerName)
 	if err != nil {
-		return err
+		split := strings.Split(err.Error(), `"`)
+
+		if len(split) < 4 {
+			return err
+		}
+
+		r.ID = split[3]
 	}
 
 	ddb.ID = r.ID

@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"dockerdb"
 	"fmt"
 	_ "github.com/denisenkom/go-mssqldb"
+	"github.com/egorgasay/dockerdb"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	"log"
