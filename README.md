@@ -41,7 +41,7 @@ if err != nil {
 ```go
 import (
   "context"
-  "dockerdb"
+  "https://github.com/egorgasay/dockerdb"
   "fmt"
   "log"
   "strconv"
