@@ -10,6 +10,10 @@ This repository contains a package for fast database deployment in Docker contai
 </ol>
 More vendors soon...
 
+# Why dockerdb?  
+  
+![изображение](https://user-images.githubusercontent.com/102957432/218540178-a2d56235-076d-400a-a5ac-b83afd49758b.png)
+
 # Usage
 Download and install it:
 ```bash
