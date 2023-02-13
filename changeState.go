@@ -4,13 +4,14 @@ import (
 	"context"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/client"
 )
 
 // Run launches the docker container
 func (ddb *VDB) Run(ctx context.Context) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = ErrAlreadyBindPort
+			err = ErrUnknown
 		}
 	}()
 
@@ -19,6 +20,22 @@ func (ddb *VDB) Run(ctx context.Context) (err error) {
 	}
 
 	return nil
+}
+
+// Run launches a docker container by ID
+func Run(ctx context.Context, ID string) error {
+	cli, err := client.NewClientWithOpts(client.FromEnv,
+		client.WithAPIVersionNegotiation())
+	if err != nil {
+		return err
+	}
+
+	ddb := &VDB{
+		ID:  ID,
+		cli: cli,
+	}
+
+	return ddb.Run(ctx)
 }
 
 // Pause suspends the docker container

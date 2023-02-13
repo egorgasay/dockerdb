@@ -27,7 +27,7 @@ const (
 
 var (
 	ErrUnsupportedVendor = errors.New("following vendor is unsupported")
-	ErrAlreadyBindPort   = errors.New("the port is already in use by another container")
+	ErrUnknown           = errors.New("unknown error")
 )
 
 type VDB struct {
