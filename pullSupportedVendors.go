@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
 	"log"
 )
 
@@ -15,12 +16,18 @@ var supportedVendors = []string{
 
 // Pull pulls an image from net.
 // WARNING!! USE IT CAREFULLY! DOWNLOADING SOME DB IMAGES MAY TAKE SOME TIME
-func (ddb *VDB) Pull(ctx context.Context, vendor string) error {
-	if !ddb.contains(supportedVendors, vendor) {
+func Pull(ctx context.Context, vendor string) error {
+	if contains(supportedVendors, vendor) {
 		return ErrUnsupportedVendor
 	}
 
-	pull, err := ddb.cli.ImagePull(ctx, vendor, types.ImagePullOptions{})
+	cli, err := client.NewClientWithOpts(client.FromEnv,
+		client.WithAPIVersionNegotiation())
+	if err != nil {
+		return err
+	}
+
+	pull, err := cli.ImagePull(ctx, vendor, types.ImagePullOptions{})
 	if err != nil {
 		return err
 	}
@@ -38,7 +45,7 @@ func (ddb *VDB) Pull(ctx context.Context, vendor string) error {
 	return nil
 }
 
-func (ddb *VDB) contains(s []string, e string) bool {
+func contains(s []string, e string) bool {
 	for _, a := range s {
 		if a == e {
 			return true
