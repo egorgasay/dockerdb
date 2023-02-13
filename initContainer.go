@@ -50,7 +50,6 @@ func (ddb *VDB) init(ctx context.Context) error {
 	r, err := ddb.cli.ContainerCreate(ctx, &container.Config{
 		Image: ddb.conf.Vendor.Image,
 		Env:   env,
-		//Cmd:   []string{"sh", "-c", "while true; do sleep 10; done"},
 	}, hostConfig, nil, nil, containerName)
 	if err != nil {
 		split := strings.Split(err.Error(), `"`)

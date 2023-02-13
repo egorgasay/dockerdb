@@ -13,11 +13,11 @@ import (
 func main() {
 	config := dockerdb.CustomDB{
 		DB: dockerdb.DB{
-			Name:     "test",
+			Name:     "admin",
 			User:     "admin",
-			Password: "test",
+			Password: "admin",
 		},
-		Port: "35231",
+		Port: "35215",
 		Vendor: dockerdb.Vendor{
 			Name:  dockerdb.Postgres,
 			Image: dockerdb.PostgresImage,
