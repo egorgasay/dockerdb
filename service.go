@@ -12,7 +12,6 @@ import (
 )
 
 const (
-	maxWaitTime = 20 * time.Second
 	tryInterval = 1 * time.Second
 
 	//MSSQL      = "mssql"
@@ -26,6 +25,7 @@ const (
 )
 
 var (
+	maxWaitTime          = 20 * time.Second
 	ErrUnsupportedVendor = errors.New("following vendor is unsupported")
 	ErrUnknown           = errors.New("unknown error")
 )
