@@ -55,35 +55,35 @@ import (
 )
 
 func main() {
-  // Specify the data that is needed to run the database
-  config := dockerdb.CustomDB{
-    DB: dockerdb.DB{
-          Name:     "admin",
-          User:     "admin",
-          Password: "admin",
-      },
-      Port:   "45217",
-      Vendor: dockerdb.Postgres15,
-  }
-  
-  ctx := context.TODO()
-  vdb, err := dockerdb.New(ctx, config)
-  if err != nil {
-    log.Fatal(err)
-  }
-  
-  // testing db is working
-  var answer string
-  err = vdb.DB.QueryRow("SELECT 'db is up'").Scan(&answer)
-  if err != nil {
-    log.Fatal(err)
-  }
-
-  fmt.Println(answer)
-
-  if err = vdb.Stop(ctx); err != nil {
-    log.Fatal(err)
-  }
+	// Specify the data that is needed to run the database
+	config := dockerdb.CustomDB{
+		DB: dockerdb.DB{
+			Name:     "admin",
+			User:     "admin",
+		Password: "admin",
+		},
+		Port:   "45217",
+		Vendor: dockerdb.Postgres15,
+	}
+      
+	ctx := context.TODO()
+	vdb, err := dockerdb.New(ctx, config)
+	if err != nil {
+		log.Fatal(err)
+	}
+      
+      // testing db is working
+	var answer string
+	err = vdb.DB.QueryRow("SELECT 'db is up'").Scan(&answer)
+	if err != nil {
+		log.Fatal(err)
+	}
+    
+	fmt.Println(answer)
+    
+	if err = vdb.Stop(ctx); err != nil {
+		log.Fatal(err)
+	}
 }
 ```
 
@@ -102,45 +102,46 @@ import (
 )
 
 func main() {
-  // Specify the data that is needed to run the database
-  config := dockerdb.CustomDB{
-    DB: dockerdb.DB{
-          Name:     "admin",
-          User:     "admin",
-          Password: "admin",
-      },
-      Port:   "45217",
-      Vendor: "postgres:10",
+	// Specify the data that is needed to run the database
+	config := dockerdb.CustomDB{
+		DB: dockerdb.DB{
+			Name:     "admin",
+			User:     "admin",
+			Password: "admin",
+		},
+		Port:   "45217",
+		Vendor: "postgres:10",
 
-    PortDocker: "5432/tcp",
-    EnvDocker:  []string{"POSTGRES_DB=" + ddb.conf.DB.Name, "POSTGRES_USER=" + ddb.conf.DB.User,
-"POSTGRES_PASSWORD=" + ddb.conf.DB.Password},
-  }
+		PortDocker: "5432/tcp",
+		EnvDocker:  []string{"POSTGRES_DB=" + "DBNAME", "POSTGRES_USER=" + "USERNAME",
+			"POSTGRES_PASSWORD=" + "PASSWORD"},
+	}
 
-	// This will allow you to upload the image to your computer.
+	// This will allow you to upload the image to your computer. 
 	ctx := context.TODO()
 	err := dockerdb.Pull(ctx, "postgres:10")
 	if err != nil {
 		log.Fatal(err)
 	}
-  
-  ctx := context.TODO()
-  vdb, err := dockerdb.New(ctx, config)
-  if err != nil {
-    log.Fatal(err)
-  }
-  
-  // testing db is working
-  var answer string
-  err = vdb.DB.QueryRow("SELECT 'db is up'").Scan(&answer)
-  if err != nil {
-    log.Fatal(err)
-  }
 
-  fmt.Println(answer)
+	vdb, err := dockerdb.New(ctx, config)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-  if err = vdb.Stop(ctx); err != nil {
-    log.Fatal(err)
-  }
+	// testing db is working
+	var answer string
+	err = vdb.DB.QueryRow("SELECT 'db is up'").Scan(&answer)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(answer)
+
+	if err = vdb.Stop(ctx); err != nil {
+		log.Fatal(err)
+	}
+	
+	fmt.Println("db is down")
 }
 ```
