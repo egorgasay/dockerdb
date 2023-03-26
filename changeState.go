@@ -7,7 +7,7 @@ import (
 	"github.com/docker/docker/client"
 )
 
-// Run launches the docker container
+// Run launches the docker container.
 func (ddb *VDB) Run(ctx context.Context) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -22,7 +22,7 @@ func (ddb *VDB) Run(ctx context.Context) (err error) {
 	return nil
 }
 
-// Run launches a docker container by ID
+// Run launches a docker container by ID.
 func Run(ctx context.Context, ID string) error {
 	cli, err := client.NewClientWithOpts(client.FromEnv,
 		client.WithAPIVersionNegotiation())
@@ -38,7 +38,7 @@ func Run(ctx context.Context, ID string) error {
 	return ddb.Run(ctx)
 }
 
-// Pause suspends the docker container
+// Pause suspends the docker container.
 func (ddb *VDB) Pause(ctx context.Context) (err error) {
 	if err = ddb.cli.ContainerPause(ctx, ddb.ID); err != nil {
 		return err
@@ -47,7 +47,7 @@ func (ddb *VDB) Pause(ctx context.Context) (err error) {
 	return nil
 }
 
-// Unpause resumes the docker container
+// Unpause resumes the docker container.
 func (ddb *VDB) Unpause(ctx context.Context) (err error) {
 	if err = ddb.cli.ContainerUnpause(ctx, ddb.ID); err != nil {
 		return err
@@ -56,7 +56,7 @@ func (ddb *VDB) Unpause(ctx context.Context) (err error) {
 	return nil
 }
 
-// Kill kills the docker container
+// Kill kills the docker container.
 func (ddb *VDB) Kill(ctx context.Context, signal string) (err error) {
 	if err = ddb.cli.ContainerKill(ctx, ddb.ID, signal); err != nil {
 		return err
@@ -65,7 +65,7 @@ func (ddb *VDB) Kill(ctx context.Context, signal string) (err error) {
 	return nil
 }
 
-// Stop stops the docker container
+// Stop stops the docker container.
 func (ddb *VDB) Stop(ctx context.Context) (err error) {
 	if err = ddb.cli.ContainerStop(ctx, ddb.ID, container.StopOptions{}); err != nil {
 		return err
@@ -74,7 +74,7 @@ func (ddb *VDB) Stop(ctx context.Context) (err error) {
 	return nil
 }
 
-// Restart restarts the docker container
+// Restart stops and starts a container again.
 func (ddb *VDB) Restart(ctx context.Context) (err error) {
 	if err = ddb.cli.ContainerRestart(ctx, ddb.ID, container.StopOptions{}); err != nil {
 		return err

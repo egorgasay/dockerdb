@@ -1,4 +1,5 @@
 // Package dockerdb allows user to create virtual databases using docker.
+// Tested with PostgreSQL, MySQL, MS SQL.
 package dockerdb
 
 import (
@@ -7,6 +8,7 @@ import (
 	"errors"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
+	"github.com/docker/go-connections/nat"
 	"strings"
 	"time"
 )
@@ -14,20 +16,20 @@ import (
 const (
 	tryInterval = 1 * time.Second
 
-	//MSSQL      = "mssql"
-	//MSSQLImage = "mcr.microsoft.com/mssql/server"
+	Postgres15 = "postgres:15"
+	Postgres14 = "postgres:14"
+	Postgres13 = "postgres:13"
+	Postgres12 = "postgres:12"
+	Postgres11 = "postgres:11"
 
-	Postgres      = "postgres"
-	PostgresImage = "postgres"
-
-	MySQL      = "mysql"
-	MySQLImage = "mysql"
+	MySQL5Image = "mysql:5.7"
+	MySQL8Image = "mysql:8"
 )
 
 var (
-	maxWaitTime          = 20 * time.Second
-	ErrUnsupportedVendor = errors.New("following vendor is unsupported")
-	ErrUnknown           = errors.New("unknown error")
+	maxWaitTime    = 20 * time.Second
+	ErrUnknown     = errors.New("unknown error")
+	ErrUnsupported = errors.New("unsupported db vendor")
 )
 
 type VDB struct {
@@ -44,15 +46,15 @@ type DB struct {
 	Password string
 }
 
-type Vendor struct {
-	Name  string
-	Image string
-}
-
 type CustomDB struct {
-	DB     DB
-	Port   string
-	Vendor Vendor
+	DB         DB
+	Port       string
+	Vendor     string
+	vendorName string
+
+	// Optional if you are using a supported vendor
+	PortDocker nat.Port
+	EnvDocker  []string
 }
 
 // New creates a new docker container and launches it
@@ -62,12 +64,17 @@ func New(ctx context.Context, conf CustomDB) (*VDB, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	ddb := &VDB{cli: cli, conf: conf}
 	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{})
 	if err != nil {
 		return nil, err
 	}
+
+	vendor := strings.Split(ddb.conf.Vendor, ":")
+	if len(vendor) == 0 {
+		return nil, errors.New("vendor must be not empty")
+	}
+	ddb.conf.vendorName = vendor[0]
 
 inner:
 	for _, container := range containers {

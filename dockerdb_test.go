@@ -1,30 +1,34 @@
-package main
+package dockerdb_test
 
 import (
 	"context"
 	"fmt"
-	_ "github.com/denisenkom/go-mssqldb"
-	"github.com/egorgasay/dockerdb"
+	"log"
+
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
-	"log"
+
+	"github.com/egorgasay/dockerdb"
 )
 
-func main() {
+func Example() {
 	config := dockerdb.CustomDB{
 		DB: dockerdb.DB{
 			Name:     "admin",
 			User:     "admin",
 			Password: "admin",
 		},
-		Port: "35215",
-		Vendor: dockerdb.Vendor{
-			Name:  dockerdb.Postgres,
-			Image: dockerdb.PostgresImage,
-		},
+		Port:   "45217",
+		Vendor: dockerdb.Postgres15,
 	}
 
+	// This will allow you to upload the image to your computer.
 	ctx := context.TODO()
+	err := dockerdb.Pull(ctx, dockerdb.Postgres15)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	vdb, err := dockerdb.New(ctx, config)
 	if err != nil {
 		log.Fatal(err)

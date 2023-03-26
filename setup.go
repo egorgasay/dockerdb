@@ -13,7 +13,10 @@ func (ddb *VDB) setup(ctx context.Context) error {
 		return err
 	}
 
-	ddb.ConnString = Build(ddb.conf)
+	ddb.ConnString, err = Build(ddb.conf)
+	if err != nil {
+		return err
+	}
 
 	ddb.DB, err = ddb.getDB(ddb.ConnString)
 	if err != nil {
@@ -35,7 +38,7 @@ func (ddb *VDB) getDB(connStr string) (db *sql.DB, err error) {
 			}
 			return nil, fmt.Errorf("timeout, Last error:%w", err)
 		default:
-			db, err = sql.Open(ddb.conf.Vendor.Name, connStr)
+			db, err = sql.Open(ddb.conf.vendorName, connStr)
 			if db == nil {
 				return nil, fmt.Errorf("DB is nil %w", err)
 			}

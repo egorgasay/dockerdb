@@ -3,12 +3,11 @@
 
 This repository contains a package for fast database deployment in Docker container.
 
-# Supported Vendors
+# Tested Vendors
 <ol>
 <li>PosgreSQL</li>
 <li>MySQL</li>
 </ol>
-More vendors soon...
 
 # Why dockerdb?  
   
@@ -43,30 +42,28 @@ if err != nil {
 
 # Example 
 ```go
-import (
-  "context"
-  "https://github.com/egorgasay/dockerdb"
-  "fmt"
-  "log"
-  "strconv"
-  "time"
+package main
 
-  _ "github.com/lib/pq"
+import (
+	"context"
+	"fmt"
+	"log"
+	
+	"https://github.com/egorgasay/dockerdb"
+
+    _ "github.com/lib/pq"
 )
 
 func main() {
   // Specify the data that is needed to run the database
   config := dockerdb.CustomDB{
     DB: dockerdb.DB{
-      Name:     "test",
-      User:     "admin",
-      Password: "test",
-    },
-    Port: "35231",
-    Vendor: dockerdb.Vendor{
-      Name:  dockerdb.Postgres,
-      Image: dockerdb.PostgresImage,
-    },
+          Name:     "admin",
+          User:     "admin",
+          Password: "admin",
+      },
+      Port:   "45217",
+      Vendor: dockerdb.Postgres15,
   }
   
   ctx := context.TODO()
@@ -90,3 +87,60 @@ func main() {
 }
 ```
 
+# Example 2 (Unimplemented db)
+```go
+package main
+
+import (
+    "context"
+	"fmt"
+	"log"
+	
+	"https://github.com/egorgasay/dockerdb"
+
+    _ "github.com/lib/pq"
+)
+
+func main() {
+  // Specify the data that is needed to run the database
+  config := dockerdb.CustomDB{
+    DB: dockerdb.DB{
+          Name:     "admin",
+          User:     "admin",
+          Password: "admin",
+      },
+      Port:   "45217",
+      Vendor: "postgres:10",
+
+    PortDocker: "5432/tcp",
+    EnvDocker:  []string{"POSTGRES_DB=" + ddb.conf.DB.Name, "POSTGRES_USER=" + ddb.conf.DB.User,
+"POSTGRES_PASSWORD=" + ddb.conf.DB.Password},
+  }
+
+	// This will allow you to upload the image to your computer.
+	ctx := context.TODO()
+	err := dockerdb.Pull(ctx, "postgres:10")
+	if err != nil {
+		log.Fatal(err)
+	}
+  
+  ctx := context.TODO()
+  vdb, err := dockerdb.New(ctx, config)
+  if err != nil {
+    log.Fatal(err)
+  }
+  
+  // testing db is working
+  var answer string
+  err = vdb.DB.QueryRow("SELECT 'db is up'").Scan(&answer)
+  if err != nil {
+    log.Fatal(err)
+  }
+
+  fmt.Println(answer)
+
+  if err = vdb.Stop(ctx); err != nil {
+    log.Fatal(err)
+  }
+}
+```
