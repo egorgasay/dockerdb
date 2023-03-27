@@ -3,12 +3,11 @@ package dockerdb_test
 import (
 	"context"
 	"fmt"
+	"github.com/egorgasay/dockerdb/v2"
 	"log"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
-
-	"github.com/egorgasay/dockerdb"
 )
 
 func Example() {

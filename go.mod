@@ -1,9 +1,8 @@
-module github.com/egorgasay/dockerdb
+module github.com/egorgasay/dockerdb/v2
 
 go 1.19
 
 require (
-	github.com/denisenkom/go-mssqldb v0.12.3
 	github.com/docker/docker v23.0.0+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/go-sql-driver/mysql v1.7.0
