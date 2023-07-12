@@ -92,13 +92,11 @@ func (ddb *VDB) Remove(ctx context.Context) (err error) {
 	return nil
 }
 
-// KillAndRemove kills and removes a container.
-func (ddb *VDB) KillAndRemove(ctx context.Context) (err error) {
-	if err = ddb.Kill(ctx, "SIGTERM"); err != nil {
-		return err
-	}
-
-	if err = ddb.Remove(ctx); err != nil {
+// Clear kills and removes a container.
+func (ddb *VDB) Clear(ctx context.Context) (err error) {
+	if err = ddb.cli.ContainerRemove(ctx, ddb.ID, types.ContainerRemoveOptions{
+		Force: true,
+	}); err != nil {
 		return err
 	}
 
