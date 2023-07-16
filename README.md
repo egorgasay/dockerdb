@@ -16,7 +16,7 @@ This repository contains a package for fast database deployment in Docker contai
 # Usage
 Download and install it:
 ```bash
-go get github.com/egorgasay/dockerdb
+go get github.com/egorgasay/dockerdb/v2
 ```
 
 Import it in your code:
