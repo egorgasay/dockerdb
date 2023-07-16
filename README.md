@@ -21,7 +21,7 @@ go get github.com/egorgasay/dockerdb
 
 Import it in your code:
 ```go
-import "github.com/egorgasay/dockerdb"
+import "github.com/egorgasay/dockerdb/v2"
 ```
 
 The first launch should look like this:
@@ -49,7 +49,7 @@ import (
 	"fmt"
 	"log"
 	
-	"https://github.com/egorgasay/dockerdb"
+	"https://github.com/egorgasay/dockerdb/v2"
 
     _ "github.com/lib/pq"
 )
