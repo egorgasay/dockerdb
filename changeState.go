@@ -95,7 +95,9 @@ func (ddb *VDB) Remove(ctx context.Context) (err error) {
 // Clear kills and removes a container.
 func (ddb *VDB) Clear(ctx context.Context) (err error) {
 	if err = ddb.cli.ContainerRemove(ctx, ddb.ID, types.ContainerRemoveOptions{
-		Force: true,
+		RemoveVolumes: true,
+		RemoveLinks:   true,
+		Force:         true,
 	}); err != nil {
 		return err
 	}
