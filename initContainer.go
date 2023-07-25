@@ -12,12 +12,13 @@ import (
 func (ddb *VDB) init(ctx context.Context) error {
 	var env []string
 	var portDocker nat.Port
+	var specifiedVendor = string(ddb.conf.Vendor)
 
 	if ddb.conf.Port == "" {
 		return errors.New("port must be not empty")
 	}
 
-	vendor := strings.Split(ddb.conf.Vendor, ":")
+	vendor := strings.Split(specifiedVendor, ":")
 	if len(vendor) == 0 {
 		return errors.New("vendor must be not empty")
 	}
@@ -53,8 +54,11 @@ func (ddb *VDB) init(ctx context.Context) error {
 
 	containerName := ddb.conf.DB.Name
 	r, err := ddb.cli.ContainerCreate(ctx, &container.Config{
-		Image: ddb.conf.Vendor,
+		Image: specifiedVendor,
 		Env:   env,
+		ExposedPorts: map[nat.Port]struct{}{
+			portDocker: struct{}{},
+		},
 	}, hostConfig, nil, nil, containerName)
 	if err != nil {
 		split := strings.Split(err.Error(), `"`)
@@ -66,7 +70,7 @@ func (ddb *VDB) init(ctx context.Context) error {
 		r.ID = split[3]
 	}
 
-	ddb.ID = r.ID
+	ddb.id = r.ID
 
 	err = ddb.setup(ctx)
 	if err != nil {

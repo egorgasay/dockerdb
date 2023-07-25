@@ -13,12 +13,18 @@ func (ddb *VDB) setup(ctx context.Context) error {
 		return err
 	}
 
-	ddb.ConnString, err = Build(ddb.conf)
-	if err != nil {
-		return err
+	if ddb.conf.NoSQL {
+		return nil
 	}
 
-	ddb.DB, err = ddb.getDB(ddb.ConnString)
+	if ddb.connStr == "" {
+		ddb.connStr, err = Build(ddb.conf)
+		if err != nil {
+			return err
+		}
+	}
+
+	ddb.db, err = ddb.getDB(ddb.connStr)
 	if err != nil {
 		return err
 	}

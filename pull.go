@@ -11,14 +11,14 @@ import (
 // Pull pulls an image from net.
 // WARNING!! USE IT CAREFULLY! DOWNLOADING SOME DB IMAGES MAY TAKE SOME TIME.
 // Tested with PostgreSQL, MySQL, MS SQL.
-func Pull(ctx context.Context, image string) error {
+func Pull(ctx context.Context, image DockerHubName) error {
 	cli, err := client.NewClientWithOpts(client.FromEnv,
 		client.WithAPIVersionNegotiation())
 	if err != nil {
 		return err
 	}
 
-	pull, err := cli.ImagePull(ctx, image, types.ImagePullOptions{})
+	pull, err := cli.ImagePull(ctx, string(image), types.ImagePullOptions{})
 	if err != nil {
 		return err
 	}

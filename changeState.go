@@ -2,6 +2,7 @@ package dockerdb
 
 import (
 	"context"
+	"database/sql"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
@@ -15,7 +16,7 @@ func (ddb *VDB) Run(ctx context.Context) (err error) {
 		}
 	}()
 
-	if err = ddb.cli.ContainerStart(ctx, ddb.ID, types.ContainerStartOptions{}); err != nil {
+	if err = ddb.cli.ContainerStart(ctx, ddb.id, types.ContainerStartOptions{}); err != nil {
 		return err
 	}
 
@@ -31,7 +32,7 @@ func Run(ctx context.Context, ID string) error {
 	}
 
 	ddb := &VDB{
-		ID:  ID,
+		id:  ID,
 		cli: cli,
 	}
 
@@ -40,7 +41,7 @@ func Run(ctx context.Context, ID string) error {
 
 // Pause suspends the docker container.
 func (ddb *VDB) Pause(ctx context.Context) (err error) {
-	if err = ddb.cli.ContainerPause(ctx, ddb.ID); err != nil {
+	if err = ddb.cli.ContainerPause(ctx, ddb.id); err != nil {
 		return err
 	}
 
@@ -49,7 +50,7 @@ func (ddb *VDB) Pause(ctx context.Context) (err error) {
 
 // Unpause resumes the docker container.
 func (ddb *VDB) Unpause(ctx context.Context) (err error) {
-	if err = ddb.cli.ContainerUnpause(ctx, ddb.ID); err != nil {
+	if err = ddb.cli.ContainerUnpause(ctx, ddb.id); err != nil {
 		return err
 	}
 
@@ -58,7 +59,7 @@ func (ddb *VDB) Unpause(ctx context.Context) (err error) {
 
 // Kill kills the docker container.
 func (ddb *VDB) Kill(ctx context.Context, signal string) (err error) {
-	if err = ddb.cli.ContainerKill(ctx, ddb.ID, signal); err != nil {
+	if err = ddb.cli.ContainerKill(ctx, ddb.id, signal); err != nil {
 		return err
 	}
 
@@ -67,7 +68,7 @@ func (ddb *VDB) Kill(ctx context.Context, signal string) (err error) {
 
 // Stop stops the docker container.
 func (ddb *VDB) Stop(ctx context.Context) (err error) {
-	if err = ddb.cli.ContainerStop(ctx, ddb.ID, container.StopOptions{}); err != nil {
+	if err = ddb.cli.ContainerStop(ctx, ddb.id, container.StopOptions{}); err != nil {
 		return err
 	}
 
@@ -76,7 +77,7 @@ func (ddb *VDB) Stop(ctx context.Context) (err error) {
 
 // Restart stops and starts a container again.
 func (ddb *VDB) Restart(ctx context.Context) (err error) {
-	if err = ddb.cli.ContainerRestart(ctx, ddb.ID, container.StopOptions{}); err != nil {
+	if err = ddb.cli.ContainerRestart(ctx, ddb.id, container.StopOptions{}); err != nil {
 		return err
 	}
 
@@ -85,7 +86,7 @@ func (ddb *VDB) Restart(ctx context.Context) (err error) {
 
 // Remove removes a container.
 func (ddb *VDB) Remove(ctx context.Context) (err error) {
-	if err = ddb.cli.ContainerRemove(ctx, ddb.ID, types.ContainerRemoveOptions{}); err != nil {
+	if err = ddb.cli.ContainerRemove(ctx, ddb.id, types.ContainerRemoveOptions{}); err != nil {
 		return err
 	}
 
@@ -94,13 +95,16 @@ func (ddb *VDB) Remove(ctx context.Context) (err error) {
 
 // Clear kills and removes a container.
 func (ddb *VDB) Clear(ctx context.Context) (err error) {
-	if err = ddb.cli.ContainerRemove(ctx, ddb.ID, types.ContainerRemoveOptions{
-		RemoveVolumes: true,
-		RemoveLinks:   true,
-		Force:         true,
+	if err = ddb.cli.ContainerRemove(ctx, ddb.id, types.ContainerRemoveOptions{
+		Force: true,
 	}); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+// SQL returns an *sql.DB instance.
+func (ddb *VDB) SQL() (db *sql.DB) {
+	return ddb.db
 }

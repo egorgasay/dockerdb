@@ -8,22 +8,23 @@ import (
 	"errors"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
-	"github.com/docker/go-connections/nat"
 	"strings"
 	"time"
 )
 
+type DockerHubName string
+
 const (
 	tryInterval = 1 * time.Second
 
-	Postgres15 = "postgres:15"
-	Postgres14 = "postgres:14"
-	Postgres13 = "postgres:13"
-	Postgres12 = "postgres:12"
-	Postgres11 = "postgres:11"
+	Postgres15 DockerHubName = "postgres:15"
+	Postgres14 DockerHubName = "postgres:14"
+	Postgres13 DockerHubName = "postgres:13"
+	Postgres12 DockerHubName = "postgres:12"
+	Postgres11 DockerHubName = "postgres:11"
 
-	MySQL5Image = "mysql:5.7"
-	MySQL8Image = "mysql:8"
+	MySQL5Image DockerHubName = "mysql:5.7"
+	MySQL8Image DockerHubName = "mysql:8"
 )
 
 var (
@@ -33,28 +34,11 @@ var (
 )
 
 type VDB struct {
-	ID         string
-	cli        *client.Client
-	conf       CustomDB
-	DB         *sql.DB
-	ConnString string
-}
-
-type DB struct {
-	Name     string
-	User     string
-	Password string
-}
-
-type CustomDB struct {
-	DB         DB
-	Port       string
-	Vendor     string
-	vendorName string
-
-	// Optional if you are using a supported vendor
-	PortDocker nat.Port
-	EnvDocker  []string
+	id      string
+	cli     *client.Client
+	conf    CustomDB
+	db      *sql.DB
+	connStr string
 }
 
 // New creates a new docker container and launches it
@@ -70,7 +54,7 @@ func New(ctx context.Context, conf CustomDB) (*VDB, error) {
 		return nil, err
 	}
 
-	vendor := strings.Split(ddb.conf.Vendor, ":")
+	vendor := strings.Split(string(ddb.conf.Vendor), ":")
 	if len(vendor) == 0 {
 		return nil, errors.New("vendor must be not empty")
 	}
@@ -80,13 +64,13 @@ inner:
 	for _, container := range containers {
 		for _, name := range container.Names {
 			if strings.Trim(name, "/") == conf.DB.Name {
-				ddb.ID = container.ID
+				ddb.id = container.ID
 				break inner
 			}
 		}
 	}
 
-	if ddb.ID != "" {
+	if ddb.id != "" {
 		err = ddb.setup(ctx)
 		if err != nil {
 			return nil, err
