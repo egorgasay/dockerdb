@@ -98,7 +98,6 @@ func (ddb *VDB) Clear(ctx context.Context) (err error) {
 	if err = ddb.cli.ContainerRemove(ctx, ddb.id, types.ContainerRemoveOptions{
 		Force:         true,
 		RemoveVolumes: true,
-		RemoveLinks:   true,
 	}); err != nil {
 		return err
 	}
