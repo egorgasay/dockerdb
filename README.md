@@ -49,9 +49,9 @@ import (
 	"fmt"
 	"log"
 	
-	"https://github.com/egorgasay/dockerdb/v2"
+	"github.com/egorgasay/dockerdb/v2"
 
-    _ "github.com/lib/pq"
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -96,9 +96,9 @@ import (
 	"fmt"
 	"log"
 	
-	"https://github.com/egorgasay/dockerdb"
+	"github.com/egorgasay/dockerdb"
 
-    _ "github.com/lib/pq"
+	_ "github.com/lib/pq"
 )
 
 func main() {
