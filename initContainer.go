@@ -14,7 +14,7 @@ func (ddb *VDB) init(ctx context.Context) error {
 	var portDocker nat.Port
 	var specifiedVendor = string(ddb.conf.vendor)
 
-	if ddb.conf.standardPort == "" {
+	if ddb.conf.actualPort == "" {
 		return errors.New("port must be not empty")
 	}
 
@@ -34,7 +34,7 @@ func (ddb *VDB) init(ctx context.Context) error {
 			"MYSQL_ROOT_PASSWORD=" + ddb.conf.db.Password,
 			"MYSQL_PASSWORD=" + ddb.conf.db.Password}
 	default:
-		portDocker = ddb.conf.actualPort
+		portDocker = ddb.conf.standardDBPort
 		env = ddb.conf.envDocker
 	}
 
@@ -43,7 +43,7 @@ func (ddb *VDB) init(ctx context.Context) error {
 			portDocker: []nat.PortBinding{
 				{
 					HostIP:   "0.0.0.0",
-					HostPort: ddb.conf.standardPort,
+					HostPort: string(ddb.conf.actualPort),
 				},
 			},
 		},

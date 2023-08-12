@@ -56,7 +56,7 @@ import (
 
 func main() {
 	// Specify the data that is needed to run the database
-	config := dockerdb.CustomDB{
+	config := dockerdb.Config{
 		db: dockerdb.db{
 			Name:     "admin",
 			User:     "admin",
@@ -103,7 +103,7 @@ import (
 
 func main() {
 	// Specify the data that is needed to run the database
-	config := dockerdb.CustomDB{
+	config := dockerdb.Config{
 		db: dockerdb.db{
 			Name:     "admin",
 			User:     "admin",
@@ -112,7 +112,7 @@ func main() {
 		StandartPort:   "45217",
 		vendor: "postgres:10",
 
-		actualPort: "5432/tcp",
+		standardDBPort: "5432/tcp",
 		envDocker:  []string{"POSTGRES_DB=" + "DBNAME", "POSTGRES_USER=" + "USERNAME",
 			"POSTGRES_PASSWORD=" + "PASSWORD"},
 	}

@@ -2,7 +2,6 @@ package dockerdb
 
 import (
 	"context"
-	"database/sql"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
@@ -103,9 +102,4 @@ func (ddb *VDB) Clear(ctx context.Context) (err error) {
 	}
 
 	return nil
-}
-
-// SQL returns an *sql.DB instance.
-func (ddb *VDB) SQL() (db *sql.DB) {
-	return ddb.db
 }

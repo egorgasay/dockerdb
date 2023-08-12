@@ -39,13 +39,13 @@ var (
 type VDB struct {
 	id      string
 	cli     *client.Client
-	conf    CustomDB
+	conf    Config
 	db      *sql.DB
 	connStr string
 }
 
 // New creates a new docker container and launches it
-func New(ctx context.Context, conf CustomDB) (*VDB, error) {
+func New(ctx context.Context, conf Config) (*VDB, error) {
 	if conf.pullImage {
 		ctx := context.TODO()
 		err := Pull(ctx, conf.vendor)
@@ -54,8 +54,16 @@ func New(ctx context.Context, conf CustomDB) (*VDB, error) {
 		}
 	}
 
-	if err := validate(conf); err != nil {
+	var err error
+	if err = validate(conf); err != nil {
 		return nil, err
+	}
+
+	if conf.actualPort == "" {
+		conf.actualPort, err = getFreePort()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	cli, err := client.NewClientWithOpts(client.FromEnv,
@@ -97,6 +105,23 @@ inner:
 	err = ddb.init(ctx)
 	if err != nil {
 		return ddb, err
+	}
+
+	if ddb.conf.noSQL {
+		check := ddb.conf.checkWakeUp
+		var stop bool
+		for i := 0; i < check.tries; i++ {
+			stop = check.fn(conf)
+			if !stop {
+				time.Sleep(check.sleepTime)
+			}
+		}
+
+		if !stop {
+			return nil, ErrUnknown
+		}
+
+		return ddb, nil
 	}
 
 	return ddb, nil

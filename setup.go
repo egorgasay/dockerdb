@@ -18,7 +18,7 @@ func (ddb *VDB) setup(ctx context.Context) error {
 	}
 
 	if ddb.connStr == "" {
-		ddb.connStr, err = Build(ddb.conf)
+		ddb.connStr, err = buildConnStr(ddb.conf)
 		if err != nil {
 			return err
 		}

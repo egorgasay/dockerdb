@@ -2,10 +2,11 @@ package dockerdb
 
 import (
 	"github.com/docker/go-connections/nat"
+	"time"
 )
 
-func Config() *CustomDB {
-	return &CustomDB{
+func EmptyConfig() *Config {
+	return &Config{
 		db: db{
 			User:     "test",
 			Password: "test",
@@ -19,75 +20,102 @@ type db struct {
 	Password string
 }
 
-type CustomDB struct {
-	db           db
-	standardPort string
-	vendor       DockerHubName
-	vendorName   string
+type Config struct {
+	db             db
+	standardDBPort nat.Port
+	vendor         DockerHubName
+	vendorName     string
 
-	// Optional if you are using a supported vendor
-	actualPort nat.Port
-	envDocker  []string
-	noSQL      bool
-	sqlConnStr string
-	pullImage  bool
+	// Optional
+	actualPort  nat.Port
+	envDocker   []string
+	sqlConnStr  string
+	noSQL       bool
+	checkWakeUp checkWakeUp
+	pullImage   bool
 }
 
-func (c *CustomDB) DBName(name string) *CustomDB {
+type checkWakeUp struct {
+	fn        func(conf Config) (stop bool)
+	sleepTime time.Duration
+	tries     int
+}
+
+// DBName sets the name of the database.
+func (c *Config) DBName(name string) *Config {
 	c.db.Name = name
 	return c
 }
 
-func (c *CustomDB) DBUser(user string) *CustomDB {
+// DBUser sets the user of the database.
+func (c *Config) DBUser(user string) *Config {
 	c.db.User = user
 	return c
 }
 
-func (c *CustomDB) DBPassword(password string) *CustomDB {
+// DBPassword sets the password of the database.
+func (c *Config) DBPassword(password string) *Config {
 	c.db.Password = password
 	return c
 }
 
-func (c *CustomDB) Vendor(vendor DockerHubName) *CustomDB {
+// Vendor sets the vendor of the database.
+func (c *Config) Vendor(vendor DockerHubName) *Config {
 	c.vendor = vendor
 	return c
 }
 
-func (c *CustomDB) StandardPort(port nat.Port) *CustomDB {
-	c.standardPort = string(port)
-	return c
-}
-
-func (c *CustomDB) ActualDBPort(port nat.Port) *CustomDB {
+// ActualPort allows you to set the actual port for the database.
+// Random unused port is used by default.
+func (c *Config) ActualPort(port nat.Port) *Config {
 	c.actualPort = port
 	return c
 }
 
-func (c *CustomDB) DockerEnv(env []string) *CustomDB {
+// StandardDBPort represents the standard port of the database which can be used to connect to it.
+func (c *Config) StandardDBPort(port nat.Port) *Config {
+	c.standardDBPort = port
+	return c
+}
+
+// DockerEnv sets the environment variables for docker.
+func (c *Config) DockerEnv(env []string) *Config {
 	c.envDocker = env
 	return c
 }
 
-func (c *CustomDB) SQL() *CustomDB {
+// SQL sets db kind to SQL.
+func (c *Config) SQL() *Config {
 	c.noSQL = false
 	return c
 }
 
-func (c *CustomDB) NoSQL() *CustomDB {
+// NoSQL sets db kind to NoSQL.
+func (c *Config) NoSQL(checkWakeUp func(conf Config) (stop bool), tries int, sleepTime time.Duration) *Config {
+	c.checkWakeUp.fn = checkWakeUp
+	c.checkWakeUp.tries = tries
+	c.checkWakeUp.sleepTime = sleepTime
 	c.noSQL = true
 	return c
 }
 
-func (c *CustomDB) SQLConnStr(connString string) *CustomDB {
+// SQLConnStr sets the SQL connection string. (Use it only for unsupported databases).
+func (c *Config) SQLConnStr(connString string) *Config {
 	c.sqlConnStr = connString
 	return c
 }
 
-func (c *CustomDB) PullImage() *CustomDB {
+// PullImage pulls the vendor image.
+func (c *Config) PullImage() *Config {
 	c.pullImage = true
 	return c
 }
 
-func (c *CustomDB) Build() CustomDB {
+// Build builds the config. After building, the config can be used and can't be changed.
+func (c *Config) Build() Config {
 	return *c
+}
+
+func validate(c Config) error {
+	return nil
 }
