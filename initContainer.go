@@ -12,9 +12,9 @@ import (
 func (ddb *VDB) init(ctx context.Context) error {
 	var env []string
 	var portDocker nat.Port
-	var specifiedVendor = string(ddb.conf.Vendor)
+	var specifiedVendor = string(ddb.conf.vendor)
 
-	if ddb.conf.Port == "" {
+	if ddb.conf.standardPort == "" {
 		return errors.New("port must be not empty")
 	}
 
@@ -26,16 +26,16 @@ func (ddb *VDB) init(ctx context.Context) error {
 	switch vendor[0] {
 	case "postgres":
 		portDocker = "5432/tcp"
-		env = []string{"POSTGRES_DB=" + ddb.conf.DB.Name, "POSTGRES_USER=" + ddb.conf.DB.User,
-			"POSTGRES_PASSWORD=" + ddb.conf.DB.Password}
+		env = []string{"POSTGRES_DB=" + ddb.conf.db.Name, "POSTGRES_USER=" + ddb.conf.db.User,
+			"POSTGRES_PASSWORD=" + ddb.conf.db.Password}
 	case "mysql":
 		portDocker = "3306/tcp"
-		env = []string{"MYSQL_DATABASE=" + ddb.conf.DB.Name, "MYSQL_USER=" + ddb.conf.DB.User,
-			"MYSQL_ROOT_PASSWORD=" + ddb.conf.DB.Password,
-			"MYSQL_PASSWORD=" + ddb.conf.DB.Password}
+		env = []string{"MYSQL_DATABASE=" + ddb.conf.db.Name, "MYSQL_USER=" + ddb.conf.db.User,
+			"MYSQL_ROOT_PASSWORD=" + ddb.conf.db.Password,
+			"MYSQL_PASSWORD=" + ddb.conf.db.Password}
 	default:
-		portDocker = ddb.conf.PortDocker
-		env = ddb.conf.EnvDocker
+		portDocker = ddb.conf.actualPort
+		env = ddb.conf.envDocker
 	}
 
 	hostConfig := &container.HostConfig{
@@ -43,7 +43,7 @@ func (ddb *VDB) init(ctx context.Context) error {
 			portDocker: []nat.PortBinding{
 				{
 					HostIP:   "0.0.0.0",
-					HostPort: ddb.conf.Port,
+					HostPort: ddb.conf.standardPort,
 				},
 			},
 		},
@@ -52,7 +52,7 @@ func (ddb *VDB) init(ctx context.Context) error {
 		},
 	}
 
-	containerName := ddb.conf.DB.Name
+	containerName := ddb.conf.db.Name
 	r, err := ddb.cli.ContainerCreate(ctx, &container.Config{
 		Image: specifiedVendor,
 		Env:   env,

@@ -13,7 +13,7 @@ func (ddb *VDB) setup(ctx context.Context) error {
 		return err
 	}
 
-	if ddb.conf.NoSQL {
+	if ddb.conf.noSQL {
 		return nil
 	}
 
@@ -46,7 +46,7 @@ func (ddb *VDB) getDB(connStr string) (db *sql.DB, err error) {
 		default:
 			db, err = sql.Open(ddb.conf.vendorName, connStr)
 			if db == nil {
-				return nil, fmt.Errorf("DB is nil %w", err)
+				return nil, fmt.Errorf("db is nil %w", err)
 			}
 
 			errPing = db.Ping()

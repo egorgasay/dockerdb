@@ -18,11 +18,12 @@ import (
 func TestPostgres15(t *testing.T) {
 	config := *dockerdb.
 		Config().
-		SetName("test").
-		SetUser("test").
-		SetPassword("test").
+		DBName("test").
+		DBUser("test").
+		DBPassword("test").
 		SetDBPort("45217").
-		SetVendor(dockerdb.Postgres15)
+		SetVendor(dockerdb.Postgres15).
+		SetSQL()
 
 	// This will allow you to upload the image to your computer.
 	ctx := context.TODO()
@@ -53,24 +54,12 @@ func TestPostgres15(t *testing.T) {
 }
 
 func TestKeyDB(t *testing.T) {
-	config := dockerdb.CustomDB{
-		DB: dockerdb.DB{
-			Name:     "keydb",
-			User:     "adm",
-			Password: "",
-		},
-		Port:       "6379",
-		Vendor:     "eqalpha/keydb",
-		PortDocker: nat.Port("6379/tcp"),
-		NoSQL:      true,
-	}
+	config := dockerdb.Config().
+		DBName("mykeydb").DBUser("adm").DBPassword("").
+		StandardPort("6379").ActualDBPort("6379/tcp").
+		Vendor(dockerdb.KeyDBImage).NoSQL().PullImage().Build()
 
-	// This will allow you to upload the image to your computer.
 	ctx := context.TODO()
-	err := dockerdb.Pull(ctx, config.Vendor)
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	vdb, err := dockerdb.New(ctx, config)
 	if err != nil {
@@ -82,9 +71,9 @@ func TestKeyDB(t *testing.T) {
 	var pong string
 	for i := 0; i < 10; i++ {
 		cl = keydb.NewClient(&keydb.Options{
-			Addr:     fmt.Sprintf("%s:%s", "127.0.0.1", config.Port),
-			Username: config.DB.User,
-			Password: config.DB.Password,
+			Addr:     fmt.Sprintf("%s:%s", "127.0.0.1", "6379"),
+			Username: "adm",
+			Password: "",
 			DB:       0,
 		})
 
@@ -112,27 +101,27 @@ func TestKeyDB(t *testing.T) {
 
 func TestScyllaDB(t *testing.T) {
 	cfg := dockerdb.CustomDB{
-		DB: dockerdb.DB{
+		db: dockerdb.db{
 			Name:     "scylladb",
 			User:     "cassandra",
 			Password: "cassandra",
 		},
-		Port:   "9042",
-		Vendor: "scylladb/scylla",
-		EnvDocker: []string{
+		standardPort: "9042",
+		vendor:       "scylladb/scylla",
+		envDocker: []string{
 			"--smp", "1",
 			"--authenticator", "PasswordAuthenticator",
 			"--broadcast-address", "127.0.0.1",
 			"--listen-address", "0.0.0.0",
 			"--broadcast-rpc-address", "127.0.0.1",
 		},
-		PortDocker: nat.Port("9042/tcp"),
-		NoSQL:      true,
+		actualPort: nat.Port("9042/tcp"),
+		noSQL:      true,
 	}
 
 	// This will allow you to upload the image to your computer.
 	ctx := context.TODO()
-	err := dockerdb.Pull(ctx, cfg.Vendor)
+	err := dockerdb.Pull(ctx, cfg.vendor)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -147,7 +136,7 @@ func TestScyllaDB(t *testing.T) {
 	config.ProtoVersion = 4
 	config.Consistency = gocql.LocalOne
 	config.Authenticator = gocql.PasswordAuthenticator{
-		Username: cfg.DB.User, Password: cfg.DB.Password,
+		Username: cfg.db.User, Password: cfg.db.Password,
 	}
 	config.Hosts = []string{"127.0.0.1"}
 	config.Timeout = 5 * time.Second

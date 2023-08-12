@@ -6,6 +6,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 	"strings"
@@ -23,8 +24,10 @@ const (
 	Postgres12 DockerHubName = "postgres:12"
 	Postgres11 DockerHubName = "postgres:11"
 
-	MySQL5Image DockerHubName = "mysql:5.7"
-	MySQL8Image DockerHubName = "mysql:8"
+	MySQL5Image   DockerHubName = "mysql:5.7"
+	MySQL8Image   DockerHubName = "mysql:8"
+	KeyDBImage    DockerHubName = "eqalpha/keydb"
+	ScyllaDBImage DockerHubName = "scylladb/scylla"
 )
 
 var (
@@ -43,6 +46,18 @@ type VDB struct {
 
 // New creates a new docker container and launches it
 func New(ctx context.Context, conf CustomDB) (*VDB, error) {
+	if conf.pullImage {
+		ctx := context.TODO()
+		err := Pull(ctx, conf.vendor)
+		if err != nil {
+			return nil, fmt.Errorf("pull error: %w", err)
+		}
+	}
+
+	if err := validate(conf); err != nil {
+		return nil, err
+	}
+
 	cli, err := client.NewClientWithOpts(client.FromEnv,
 		client.WithAPIVersionNegotiation())
 	if err != nil {
@@ -54,7 +69,7 @@ func New(ctx context.Context, conf CustomDB) (*VDB, error) {
 		return nil, err
 	}
 
-	vendor := strings.Split(string(ddb.conf.Vendor), ":")
+	vendor := strings.Split(string(ddb.conf.vendor), ":")
 	if len(vendor) == 0 {
 		return nil, errors.New("vendor must be not empty")
 	}
@@ -63,7 +78,7 @@ func New(ctx context.Context, conf CustomDB) (*VDB, error) {
 inner:
 	for _, container := range containers {
 		for _, name := range container.Names {
-			if strings.Trim(name, "/") == conf.DB.Name {
+			if strings.Trim(name, "/") == conf.db.Name {
 				ddb.id = container.ID
 				break inner
 			}

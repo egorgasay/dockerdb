@@ -57,13 +57,13 @@ import (
 func main() {
 	// Specify the data that is needed to run the database
 	config := dockerdb.CustomDB{
-		DB: dockerdb.DB{
+		db: dockerdb.db{
 			Name:     "admin",
 			User:     "admin",
 		Password: "admin",
 		},
-		Port:   "45217",
-		Vendor: dockerdb.Postgres15,
+		StandartPort:   "45217",
+		vendor: dockerdb.Postgres15,
 	}
       
 	ctx := context.TODO()
@@ -74,7 +74,7 @@ func main() {
       
       // testing db is working
 	var answer string
-	err = vdb.DB.QueryRow("SELECT 'db is up'").Scan(&answer)
+	err = vdb.db.QueryRow("SELECT 'db is up'").Scan(&answer)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -104,16 +104,16 @@ import (
 func main() {
 	// Specify the data that is needed to run the database
 	config := dockerdb.CustomDB{
-		DB: dockerdb.DB{
+		db: dockerdb.db{
 			Name:     "admin",
 			User:     "admin",
 			Password: "admin",
 		},
-		Port:   "45217",
-		Vendor: "postgres:10",
+		StandartPort:   "45217",
+		vendor: "postgres:10",
 
-		PortDocker: "5432/tcp",
-		EnvDocker:  []string{"POSTGRES_DB=" + "DBNAME", "POSTGRES_USER=" + "USERNAME",
+		actualPort: "5432/tcp",
+		envDocker:  []string{"POSTGRES_DB=" + "DBNAME", "POSTGRES_USER=" + "USERNAME",
 			"POSTGRES_PASSWORD=" + "PASSWORD"},
 	}
 
@@ -131,7 +131,7 @@ func main() {
 
 	// testing db is working
 	var answer string
-	err = vdb.DB.QueryRow("SELECT 'db is up'").Scan(&answer)
+	err = vdb.db.QueryRow("SELECT 'db is up'").Scan(&answer)
 	if err != nil {
 		log.Fatal(err)
 	}

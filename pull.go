@@ -9,7 +9,7 @@ import (
 )
 
 // Pull pulls an image from net.
-// WARNING!! USE IT CAREFULLY! DOWNLOADING SOME DB IMAGES MAY TAKE SOME TIME.
+// WARNING!! USE IT CAREFULLY! DOWNLOADING SOME db IMAGES MAY TAKE SOME TIME.
 // Tested with PostgreSQL, MySQL, MS SQL.
 func Pull(ctx context.Context, image DockerHubName) error {
 	cli, err := client.NewClientWithOpts(client.FromEnv,

@@ -1,76 +1,93 @@
 package dockerdb
 
-import "github.com/docker/go-connections/nat"
+import (
+	"github.com/docker/go-connections/nat"
+)
 
 func Config() *CustomDB {
-	return &CustomDB{}
+	return &CustomDB{
+		db: db{
+			User:     "test",
+			Password: "test",
+		},
+	}
 }
 
-type DB struct {
+type db struct {
 	Name     string
 	User     string
 	Password string
 }
 
 type CustomDB struct {
-	DB         DB
-	Port       string
-	Vendor     DockerHubName
-	vendorName string
+	db           db
+	standardPort string
+	vendor       DockerHubName
+	vendorName   string
 
 	// Optional if you are using a supported vendor
-	PortDocker nat.Port
-	EnvDocker  []string
-	NoSQL      bool
-	SQLConnStr string
+	actualPort nat.Port
+	envDocker  []string
+	noSQL      bool
+	sqlConnStr string
+	pullImage  bool
 }
 
-func (c *CustomDB) SetName(name string) *CustomDB {
-	c.DB.Name = name
+func (c *CustomDB) DBName(name string) *CustomDB {
+	c.db.Name = name
 	return c
 }
 
-func (c *CustomDB) SetUser(user string) *CustomDB {
-	c.DB.User = user
+func (c *CustomDB) DBUser(user string) *CustomDB {
+	c.db.User = user
 	return c
 }
 
-func (c *CustomDB) SetPassword(password string) *CustomDB {
-	c.DB.Password = password
+func (c *CustomDB) DBPassword(password string) *CustomDB {
+	c.db.Password = password
 	return c
 }
 
-func (c *CustomDB) SetVendor(vendor DockerHubName) *CustomDB {
-	c.Vendor = vendor
+func (c *CustomDB) Vendor(vendor DockerHubName) *CustomDB {
+	c.vendor = vendor
 	return c
 }
 
-func (c *CustomDB) SetDBPort(port string) *CustomDB {
-	c.Port = port
+func (c *CustomDB) StandardPort(port nat.Port) *CustomDB {
+	c.standardPort = string(port)
 	return c
 }
 
-func (c *CustomDB) SetExposePort(port nat.Port) *CustomDB {
-	c.PortDocker = port
+func (c *CustomDB) ActualDBPort(port nat.Port) *CustomDB {
+	c.actualPort = port
 	return c
 }
 
-func (c *CustomDB) SetEnv(env []string) *CustomDB {
-	c.EnvDocker = env
+func (c *CustomDB) DockerEnv(env []string) *CustomDB {
+	c.envDocker = env
 	return c
 }
 
-func (c *CustomDB) SetSQL() *CustomDB {
-	c.NoSQL = false
+func (c *CustomDB) SQL() *CustomDB {
+	c.noSQL = false
 	return c
 }
 
-func (c *CustomDB) SetNoSQL() *CustomDB {
-	c.NoSQL = true
+func (c *CustomDB) NoSQL() *CustomDB {
+	c.noSQL = true
 	return c
 }
 
-func (c *CustomDB) SetSQLConnStr(connString string) *CustomDB {
-	c.SQLConnStr = connString
+func (c *CustomDB) SQLConnStr(connString string) *CustomDB {
+	c.sqlConnStr = connString
 	return c
+}
+
+func (c *CustomDB) PullImage() *CustomDB {
+	c.pullImage = true
+	return c
+}
+
+func (c *CustomDB) Build() CustomDB {
+	return *c
 }
