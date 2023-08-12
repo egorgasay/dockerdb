@@ -27,6 +27,7 @@ const (
 	MySQL5Image   DockerHubName = "mysql:5.7"
 	MySQL8Image   DockerHubName = "mysql:8"
 	KeyDBImage    DockerHubName = "eqalpha/keydb"
+	RedisImage    DockerHubName = "redis"
 	ScyllaDBImage DockerHubName = "scylladb/scylla"
 )
 
