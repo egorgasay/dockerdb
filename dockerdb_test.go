@@ -3,7 +3,7 @@ package dockerdb_test
 import (
 	"context"
 	"fmt"
-	"github.com/egorgasay/dockerdb/v2"
+	"github.com/egorgasay/dockerdb/v3"
 	"github.com/gocql/gocql"
 
 	"log"
