@@ -3,12 +3,6 @@
 
 This repository contains a package for fast database deployment in Docker container.
 
-# Tested Vendors
-<ol>
-<li>PosgreSQL</li>
-<li>MySQL</li>
-</ol>
-
 # Why dockerdb?  
   
 ![изображение](https://user-images.githubusercontent.com/102957432/218540178-a2d56235-076d-400a-a5ac-b83afd49758b.png)
@@ -16,12 +10,12 @@ This repository contains a package for fast database deployment in Docker contai
 # Usage
 Download and install it:
 ```bash
-go get github.com/egorgasay/dockerdb/v2
+go get github.com/egorgasay/dockerdb/v3
 ```
 
 Import it in your code:
 ```go
-import "github.com/egorgasay/dockerdb/v2"
+import "github.com/egorgasay/dockerdb/v3"
 ```
 
 The first launch should look like this:
@@ -40,7 +34,7 @@ if err != nil {
 }
 ```
 
-# Example 
+# SQL DB Example 
 ```go
 package main
 
@@ -49,45 +43,40 @@ import (
 	"fmt"
 	"log"
 	
-	"github.com/egorgasay/dockerdb/v2"
+	"github.com/egorgasay/dockerdb/v3"
 
 	_ "github.com/lib/pq"
 )
 
 func main() {
-	// Specify the data that is needed to run the database
-	config := dockerdb.Config{
-		db: dockerdb.db{
-			Name:     "admin",
-			User:     "admin",
-		Password: "admin",
-		},
-		StandartPort:   "45217",
-		vendor: dockerdb.Postgres15,
-	}
-      
 	ctx := context.TODO()
-	vdb, err := dockerdb.New(ctx, config)
+	config := dockerdb.EmptyConfig().DBName("test").DBUser("test").
+		DBPassword("test").StandardDBPort("5432").
+		Vendor(dockerdb.Postgres15).SQL().PullImage()
+
+	vdb, err := dockerdb.New(ctx, config.Build())
 	if err != nil {
 		log.Fatal(err)
 	}
-      
-      // testing db is working
-	var answer string
-	err = vdb.db.QueryRow("SELECT 'db is up'").Scan(&answer)
+	defer vdb.Clear(ctx)
+
+	var result string
+	err = vdb.SQL().QueryRow("SELECT 'db is up'").Scan(&result)
 	if err != nil {
 		log.Fatal(err)
 	}
-    
-	fmt.Println(answer)
-    
+
+	fmt.Println(result)
+
 	if err = vdb.Stop(ctx); err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Println("db is down")
 }
 ```
 
-# Example 2 (Unimplemented db)
+# NoSQL DB Example
 ```go
 package main
 
@@ -96,52 +85,42 @@ import (
 	"fmt"
 	"log"
 	
-	"github.com/egorgasay/dockerdb"
-
-	_ "github.com/lib/pq"
+	"github.com/egorgasay/dockerdb/v3"
+	
+	redis "github.com/redis/go-redis/v9"
 )
 
 func main() {
-	// Specify the data that is needed to run the database
-	config := dockerdb.Config{
-		db: dockerdb.db{
-			Name:     "admin",
-			User:     "admin",
-			Password: "admin",
-		},
-		StandartPort:   "45217",
-		vendor: "postgres:10",
-
-		standardDBPort: "5432/tcp",
-		envDocker:  []string{"POSTGRES_DB=" + "DBNAME", "POSTGRES_USER=" + "USERNAME",
-			"POSTGRES_PASSWORD=" + "PASSWORD"},
-	}
-
-	// This will allow you to upload the image to your computer. 
+	var cl *keydb.Client
+	var err error
 	ctx := context.TODO()
-	err := dockerdb.Pull(ctx, "postgres:10")
+
+	config := dockerdb.EmptyConfig().
+		DBName("myredisdb").StandardDBPort("6379").
+		Vendor(dockerdb.RedisImage).
+		NoSQL(func(conf dockerdb.Config) (stop bool) {
+			cl = redis.NewClient(&redis.Options{
+				Addr: fmt.Sprintf("%s:%s", "127.0.0.1", conf.GetActualPort()),
+				DB:   0,
+			})
+
+			_, err = cl.Ping(ctx).Result()
+			log.Println(err)
+			return err == nil
+		}, 10, time.Second*2).PullImage()
+
+	vdb, err := dockerdb.New(ctx, config.Build())
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer vdb.Clear(ctx)
 
-	vdb, err := dockerdb.New(ctx, config)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// testing db is working
-	var answer string
-	err = vdb.db.QueryRow("SELECT 'db is up'").Scan(&answer)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println(answer)
+	fmt.Println("db is up")
 
 	if err = vdb.Stop(ctx); err != nil {
 		log.Fatal(err)
 	}
-	
+
 	fmt.Println("db is down")
 }
 ```

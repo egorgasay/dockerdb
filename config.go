@@ -1,6 +1,7 @@
 package dockerdb
 
 import (
+	"errors"
 	"github.com/docker/go-connections/nat"
 	"time"
 )
@@ -117,5 +118,17 @@ func (c *Config) Build() Config {
 }
 
 func validate(c Config) error {
+	if c.vendor == "" {
+		return errors.New("vendor must be not empty")
+	}
+
+	if c.standardDBPort == "" {
+		return errors.New("port must be not empty")
+	}
+
+	if c.db.Name == "" {
+		return errors.New("db name must be not empty")
+	}
+
 	return nil
 }

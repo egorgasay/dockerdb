@@ -34,7 +34,7 @@ const (
 var (
 	maxWaitTime    = 20 * time.Second
 	ErrUnknown     = errors.New("unknown error")
-	ErrUnsupported = errors.New("unsupported db vendor")
+	errUnsupported = errors.New("unsupported db vendor")
 )
 
 type VDB struct {

@@ -41,6 +41,6 @@ func buildConnStr(conf Config) (connStr string, err error) {
 			"%s:%s@tcp(127.0.0.1:%s)/%s",
 			conf.db.User, conf.db.Password, conf.actualPort, conf.db.Name), nil
 	default:
-		return "", ErrUnsupported
+		return "", errUnsupported
 	}
 }
