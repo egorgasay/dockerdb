@@ -2,10 +2,8 @@
 [![PkgGoDev](https://pkg.go.dev/badge/golang.org/x/mod)](https://pkg.go.dev/golang.org/x/mod)
 
 This repository contains a package for fast database deployment in Docker container.
-
 # Why dockerdb?  
-  
-![изображение](https://user-images.githubusercontent.com/102957432/218540178-a2d56235-076d-400a-a5ac-b83afd49758b.png)
+<img src="https://github.com/egorgasay/dockerdb/assets/102957432/29dedac4-604a-4aa3-8a79-dbda68a47375"/>
 
 # Usage
 Download and install it:
@@ -67,12 +65,6 @@ func main() {
 	}
 
 	fmt.Println(result)
-
-	if err = vdb.Stop(ctx); err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("db is down")
 }
 ```
 
@@ -97,8 +89,8 @@ func main() {
 
 	config := dockerdb.EmptyConfig().
 		DBName("myredisdb").StandardDBPort("6379").
-		Vendor(dockerdb.RedisImage).
-		NoSQL(func(conf dockerdb.Config) (stop bool) {
+		Vendor("redis"). // name from dockerhub
+		NoSQL(func(conf dockerdb.Config) (stop bool) { // func that will determine that the db is ready for use
 			cl = redis.NewClient(&redis.Options{
 				Addr: fmt.Sprintf("%s:%s", "127.0.0.1", conf.GetActualPort()),
 				DB:   0,
@@ -116,11 +108,5 @@ func main() {
 	defer vdb.Clear(ctx)
 
 	fmt.Println("db is up")
-
-	if err = vdb.Stop(ctx); err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("db is down")
 }
 ```
