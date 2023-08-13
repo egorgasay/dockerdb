@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/egorgasay/dockerdb/v2"
+	"github.com/egorgasay/dockerdb/v3"
 	_ "github.com/lib/pq" // PostgreSQL driver
 	"log"
 )

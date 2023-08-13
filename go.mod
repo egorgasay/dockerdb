@@ -1,4 +1,4 @@
-module github.com/egorgasay/dockerdb/v2
+module github.com/egorgasay/dockerdb/v3
 
 go 1.19
 
