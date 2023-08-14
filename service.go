@@ -125,7 +125,7 @@ inner:
 		}
 
 		if !stop {
-			return nil, ErrUnknown
+			return vdb, ErrUnknown
 		}
 
 		return vdb, nil
