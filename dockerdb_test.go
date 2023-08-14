@@ -137,9 +137,8 @@ func TestScyllaDB(t *testing.T) {
 	}).StandardDBPort("9042/tcp").NoSQL(func(conf dockerdb.Config) (stop bool) {
 		_, err := gocql.NewSession(*config)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
-		log.Println(err)
 		return err == nil
 	}, 30, time.Second*2).PullImage()
 
