@@ -23,6 +23,7 @@ func (ddb *VDB) Run(ctx context.Context) (err error) {
 }
 
 // Run launches a docker container by ID.
+// DEPRECATED: USE vdb.Run() instead.
 func Run(ctx context.Context, ID string) error {
 	cli, err := client.NewClientWithOpts(client.FromEnv,
 		client.WithAPIVersionNegotiation())

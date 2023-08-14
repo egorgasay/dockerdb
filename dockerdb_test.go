@@ -89,6 +89,33 @@ func TestWithPostgres(t *testing.T) {
 	}
 }
 
+func TestWithRedis(t *testing.T) {
+	var cl *redis.Client
+	err := dockerdb.WithRedis(context.TODO(), "simple-redis",
+		func(c dockerdb.Config) (stop bool) {
+			cl = redis.NewClient(&redis.Options{
+				Addr: fmt.Sprintf("%s:%s", "127.0.0.1", c.GetActualPort()),
+				DB:   0,
+			})
+
+			_, err := cl.Ping(context.TODO()).Result()
+			log.Println(err)
+			return err == nil
+		},
+		func(c dockerdb.Config, vdb *dockerdb.VDB) error {
+			var answer string
+			err := vdb.SQL().QueryRow("SELECT 'db is up'").Scan(&answer)
+			if err != nil {
+				return err
+			}
+			fmt.Println(answer)
+			return nil
+		})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestKeyDB(t *testing.T) {
 	var cl *keydb.Client
 	var err error
