@@ -46,7 +46,7 @@ type VDB struct {
 }
 
 // New creates a new docker container and launches it
-func New(ctx context.Context, conf Config) (*VDB, error) {
+func New(ctx context.Context, conf Config) (vdb *VDB, err error) {
 	if conf.pullImage {
 		ctx := context.TODO()
 		err := Pull(ctx, conf.vendor)
@@ -55,7 +55,6 @@ func New(ctx context.Context, conf Config) (*VDB, error) {
 		}
 	}
 
-	var err error
 	if err = validate(conf); err != nil {
 		return nil, err
 	}
@@ -72,44 +71,46 @@ func New(ctx context.Context, conf Config) (*VDB, error) {
 	if err != nil {
 		return nil, err
 	}
-	ddb := &VDB{cli: cli, conf: conf}
+
+	vdb = &VDB{}
+	vdb.cli = cli
+	vdb.conf = conf
+
 	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{})
 	if err != nil {
 		return nil, err
 	}
 
-	vendor := strings.Split(string(ddb.conf.vendor), ":")
+	vendor := strings.Split(string(vdb.conf.vendor), ":")
 	if len(vendor) == 0 {
 		return nil, errors.New("vendor must be not empty")
 	}
-	ddb.conf.vendorName = vendor[0]
+	vdb.conf.vendorName = vendor[0]
 
 inner:
 	for _, container := range containers {
 		for _, name := range container.Names {
 			if strings.Trim(name, "/") == conf.db.Name {
-				ddb.id = container.ID
+				vdb.id = container.ID
 				break inner
 			}
 		}
 	}
 
-	if ddb.id != "" {
-		err = ddb.setup(ctx)
+	if vdb.id != "" {
+		err = vdb.setup(ctx)
 		if err != nil {
 			return nil, err
 		}
-
-		return ddb, nil
+	} else {
+		err = vdb.init(ctx)
+		if err != nil {
+			return vdb, err
+		}
 	}
 
-	err = ddb.init(ctx)
-	if err != nil {
-		return ddb, err
-	}
-
-	if ddb.conf.noSQL {
-		check := ddb.conf.checkWakeUp
+	if vdb.conf.noSQL {
+		check := vdb.conf.checkWakeUp
 		var stop bool
 		for i := 0; i < check.tries; i++ {
 			stop = check.fn(conf)
@@ -122,8 +123,8 @@ inner:
 			return nil, ErrUnknown
 		}
 
-		return ddb, nil
+		return vdb, nil
 	}
 
-	return ddb, nil
+	return vdb, nil
 }
