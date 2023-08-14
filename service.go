@@ -104,7 +104,7 @@ inner:
 	if vdb.id != "" {
 		err = vdb.setup(ctx)
 		if err != nil {
-			return nil, err
+			return vdb, err
 		}
 	} else {
 		err = vdb.init(ctx)

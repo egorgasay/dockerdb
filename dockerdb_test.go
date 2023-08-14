@@ -56,6 +56,23 @@ func TestPostgresSimple(t *testing.T) {
 	fmt.Println(answer)
 }
 
+func TestPostgresWith(t *testing.T) {
+	err := dockerdb.With(context.TODO(),
+		dockerdb.PostgresConfig("simple-postgres").Build(),
+		func(c dockerdb.Config, vdb *dockerdb.VDB) error {
+			var answer string
+			err := vdb.SQL().QueryRow("SELECT 'db is up'").Scan(&answer)
+			if err != nil {
+				return err
+			}
+			fmt.Println(answer)
+			return nil
+		})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestKeyDB(t *testing.T) {
 	var cl *keydb.Client
 	var err error
