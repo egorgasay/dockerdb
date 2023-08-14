@@ -1,6 +1,7 @@
 package dockerdb
 
 import (
+	"errors"
 	"fmt"
 	"github.com/docker/go-connections/nat"
 	"net"
@@ -32,15 +33,15 @@ func getFreePort() (nat.Port, error) {
 // buildConnStr builds connection string by CustomDB config.
 func buildConnStr(conf Config) (connStr string, err error) {
 	switch conf.vendorName {
-	case "postgres":
+	case postgres:
 		return fmt.Sprintf(
 			"host=localhost user=%s password='%s' dbname=%s port=%s sslmode=disable",
 			conf.db.User, conf.db.Password, conf.db.Name, conf.actualPort), nil
-	case "mysql":
+	case mysql:
 		return fmt.Sprintf(
 			"%s:%s@tcp(127.0.0.1:%s)/%s",
 			conf.db.User, conf.db.Password, conf.actualPort, conf.db.Name), nil
 	default:
-		return "", errUnsupported
+		return "", errors.New("use of unsupported db vendor and no connection string provided")
 	}
 }

@@ -24,11 +24,11 @@ func (ddb *VDB) init(ctx context.Context) error {
 	}
 
 	switch vendor[0] {
-	case "postgres":
+	case postgres:
 		portDocker = "5432/tcp"
 		env = []string{"POSTGRES_DB=" + ddb.conf.db.Name, "POSTGRES_USER=" + ddb.conf.db.User,
 			"POSTGRES_PASSWORD=" + ddb.conf.db.Password}
-	case "mysql":
+	case mysql:
 		portDocker = "3306/tcp"
 		env = []string{"MYSQL_DATABASE=" + ddb.conf.db.Name, "MYSQL_USER=" + ddb.conf.db.User,
 			"MYSQL_ROOT_PASSWORD=" + ddb.conf.db.Password,

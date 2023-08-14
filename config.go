@@ -3,6 +3,7 @@ package dockerdb
 import (
 	"errors"
 	"github.com/docker/go-connections/nat"
+	"strings"
 	"time"
 )
 
@@ -85,12 +86,6 @@ func (c *Config) DockerEnv(env []string) *Config {
 	return c
 }
 
-// SQL sets db kind to SQL.
-func (c *Config) SQL() *Config {
-	c.noSQL = false
-	return c
-}
-
 // NoSQL sets db kind to NoSQL.
 func (c *Config) NoSQL(checkWakeUp func(conf Config) (stop bool), tries int, sleepTime time.Duration) *Config {
 	c.checkWakeUp.fn = checkWakeUp
@@ -100,9 +95,20 @@ func (c *Config) NoSQL(checkWakeUp func(conf Config) (stop bool), tries int, sle
 	return c
 }
 
-// SQLConnStr sets the SQL connection string. (Use it only for unsupported databases).
-func (c *Config) SQLConnStr(connString string) *Config {
-	c.sqlConnStr = connString
+// UnimplementedSQL sets the SQL connection string format.
+// Example template: "{user}:{password}@127.0.0.1:{port}/{dbname}"
+func (c *Config) UnimplementedSQL(connStringFormat string) *Config {
+	sqlConnStr := strings.Replace(connStringFormat, "{user}", c.db.User, -1)
+	sqlConnStr = strings.Replace(sqlConnStr, "{password}", c.db.Password, -1)
+	sqlConnStr = strings.Replace(sqlConnStr, "{dbname}", c.db.Name, -1)
+	sqlConnStr = strings.Replace(sqlConnStr, "{port}", string(c.actualPort), -1)
+
+	c.sqlConnStr = sqlConnStr
+	return c
+}
+
+func (c *Config) SQL() *Config {
+	c.noSQL = false
 	return c
 }
 

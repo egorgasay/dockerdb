@@ -31,10 +31,14 @@ const (
 	ScyllaDBImage DockerHubName = "scylladb/scylla"
 )
 
+const (
+	postgres = "postgres"
+	mysql    = "mysql"
+)
+
 var (
-	maxWaitTime    = 20 * time.Second
-	ErrUnknown     = errors.New("unknown error")
-	errUnsupported = errors.New("unsupported db vendor")
+	maxWaitTime = 20 * time.Second
+	ErrUnknown  = errors.New("unknown error")
 )
 
 type VDB struct {
