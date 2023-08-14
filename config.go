@@ -16,6 +16,91 @@ func EmptyConfig() *Config {
 	}
 }
 
+func PostgresConfig(dbname string) *Config {
+	return &Config{
+		db: db{
+			Name:     dbname,
+			User:     "dockerdb",
+			Password: "dockerdb",
+		},
+		standardDBPort: "5432",
+		vendor:         Postgres15,
+		noSQL:          false,
+		pullImage:      true,
+	}
+}
+
+func MySQLConfig(dbname string) *Config {
+	return &Config{
+		db: db{
+			Name:     dbname,
+			User:     "dockerdb",
+			Password: "dockerdb",
+		},
+		standardDBPort: "3306",
+		vendor:         MySQL8Image,
+		noSQL:          false,
+		pullImage:      true,
+	}
+}
+
+func ScyllaDBConfig(dbname string, closure func(c Config) (stop bool)) *Config {
+	return &Config{
+		db: db{
+			Name:     dbname,
+			User:     "dockerdb",
+			Password: "dockerdb",
+		},
+		standardDBPort: "9140",
+		vendor:         ScyllaDBImage,
+		noSQL:          true,
+		pullImage:      true,
+		checkWakeUp: checkWakeUp{
+			fn:        closure,
+			sleepTime: time.Second * 2,
+			tries:     20,
+		},
+	}
+}
+
+func RedisConfig(dbname string, closure func(c Config) (stop bool)) *Config {
+	return &Config{
+		db: db{
+			Name:     dbname,
+			User:     "dockerdb",
+			Password: "dockerdb",
+		},
+		standardDBPort: "6379",
+		vendor:         RedisImage,
+		noSQL:          true,
+		pullImage:      true,
+		checkWakeUp: checkWakeUp{
+			fn:        closure,
+			sleepTime: time.Second * 2,
+			tries:     20,
+		},
+	}
+}
+
+func KeyDBConfig(dbname string, closure func(c Config) (stop bool)) *Config {
+	return &Config{
+		db: db{
+			Name:     dbname,
+			User:     "dockerdb",
+			Password: "dockerdb",
+		},
+		standardDBPort: "6379",
+		vendor:         KeyDBImage,
+		noSQL:          true,
+		pullImage:      true,
+		checkWakeUp: checkWakeUp{
+			fn:        closure,
+			sleepTime: time.Second * 2,
+			tries:     20,
+		},
+	}
+}
+
 type db struct {
 	Name     string
 	User     string

@@ -24,19 +24,36 @@ func TestPostgres15(t *testing.T) {
 
 	vdb, err := dockerdb.New(ctx, config.Build())
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer vdb.Clear(ctx)
 
 	var answer string
 	err = vdb.SQL().QueryRow("SELECT 'db is up'").Scan(&answer)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	fmt.Println(answer)
 
 	fmt.Println("db is down")
+}
+
+func TestPostgresSimple(t *testing.T) {
+	ctx := context.TODO()
+	vdb, err := dockerdb.New(ctx, dockerdb.PostgresConfig("simple-postgres").Build())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer vdb.Clear(ctx)
+
+	var answer string
+	err = vdb.SQL().QueryRow("SELECT 'db is up'").Scan(&answer)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fmt.Println(answer)
 }
 
 func TestKeyDB(t *testing.T) {
@@ -60,11 +77,36 @@ func TestKeyDB(t *testing.T) {
 
 	vdb, err := dockerdb.New(ctx, config.Build())
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer vdb.Clear(ctx)
 
 	fmt.Println("db is down")
+}
+
+func TestKeyDBSimple(t *testing.T) {
+	var cl *keydb.Client
+	var err error
+	ctx := context.TODO()
+
+	config := dockerdb.KeyDBConfig("simple-keyDB", func(conf dockerdb.Config) (stop bool) {
+		cl = keydb.NewClient(&keydb.Options{
+			Addr: fmt.Sprintf("%s:%s", "127.0.0.1", conf.GetActualPort()),
+			DB:   0,
+		})
+
+		_, err = cl.Ping(ctx).Result()
+		log.Println(err)
+		return err == nil
+	})
+
+	vdb, err := dockerdb.New(ctx, config.Build())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer vdb.Clear(ctx)
+
+	fmt.Println("db is up and everything is fine")
 }
 
 func TestRedis(t *testing.T) {
@@ -88,7 +130,7 @@ func TestRedis(t *testing.T) {
 
 	vdb, err := dockerdb.New(ctx, config.Build())
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer vdb.Clear(ctx)
 

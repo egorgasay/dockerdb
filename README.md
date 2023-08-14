@@ -68,6 +68,38 @@ func main() {
 }
 ```
 
+# Prepared Config Example
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+
+	"github.com/egorgasay/dockerdb/v3"
+
+	_ "github.com/lib/pq"
+)
+
+func main() {
+	ctx := context.TODO()
+	vdb, err := dockerdb.New(ctx, dockerdb.PostgresConfig("simple-postgres").Build())
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer vdb.Clear(ctx)
+
+	var result string
+	err = vdb.SQL().QueryRow("SELECT 'db is up'").Scan(&result)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(result)
+}
+```
+
 # NoSQL DB Example
 ```go
 package main
