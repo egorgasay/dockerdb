@@ -36,10 +36,6 @@ func TestPostgres15(t *testing.T) {
 
 	fmt.Println(answer)
 
-	if err = vdb.Stop(ctx); err != nil {
-		log.Fatal(err)
-	}
-
 	fmt.Println("db is down")
 }
 
@@ -67,12 +63,6 @@ func TestKeyDB(t *testing.T) {
 		log.Fatal(err)
 	}
 	defer vdb.Clear(ctx)
-
-	fmt.Println("db is up")
-
-	if err = vdb.Stop(ctx); err != nil {
-		log.Fatal(err)
-	}
 
 	fmt.Println("db is down")
 }
@@ -102,12 +92,6 @@ func TestRedis(t *testing.T) {
 	}
 	defer vdb.Clear(ctx)
 
-	fmt.Println("db is up")
-
-	if err = vdb.Stop(ctx); err != nil {
-		log.Fatal(err)
-	}
-
 	fmt.Println("db is down")
 }
 
@@ -122,19 +106,19 @@ func TestScyllaDB(t *testing.T) {
 	config.ProtoVersion = 4
 	config.Consistency = gocql.LocalOne
 	config.Authenticator = auth
-	config.Hosts = []string{"127.0.0.1"}
 	config.Timeout = 5 * time.Second
 	config.ConnectTimeout = 5 * time.Second
 
 	cfg := dockerdb.EmptyConfig().Vendor(dockerdb.ScyllaDBImage).
 		DBName("testScylla").DBUser(auth.Username).DBPassword(auth.Password).
-		ActualPort("9042").DockerEnv([]string{
-		"--smp", "1",
-		"--authenticator", "PasswordAuthenticator",
-		"--broadcast-address", "127.0.0.1",
-		"--listen-address", "0.0.0.0",
-		"--broadcast-rpc-address", "127.0.0.1",
-	}).StandardDBPort("9042/tcp").NoSQL(func(conf dockerdb.Config) (stop bool) {
+		DockerEnv([]string{
+			"--smp", "1",
+			"--authenticator", "PasswordAuthenticator",
+			"--broadcast-address", "127.0.0.1",
+			"--listen-address", "0.0.0.0",
+			"--broadcast-rpc-address", "127.0.0.1",
+		}).StandardDBPort("9042").NoSQL(func(conf dockerdb.Config) (stop bool) {
+		config.Hosts = []string{string("127.0.0.1:" + conf.GetActualPort())}
 		_, err := gocql.NewSession(*config)
 		if err != nil {
 			log.Println(err)
@@ -144,7 +128,7 @@ func TestScyllaDB(t *testing.T) {
 
 	vdb, err := dockerdb.New(ctx, cfg.Build())
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 	defer vdb.Clear(ctx)
 
@@ -170,11 +154,6 @@ func TestScyllaDB(t *testing.T) {
 	err = ses.Query("SELECT key FROM system.local").Scan(&ans)
 	if err != nil {
 		t.Error("SELECT: ", err)
-		return
-	}
-
-	if err = vdb.Stop(ctx); err != nil {
-		t.Error(err)
 		return
 	}
 

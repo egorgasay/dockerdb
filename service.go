@@ -114,9 +114,10 @@ inner:
 		var stop bool
 		for i := 0; i < check.tries; i++ {
 			stop = check.fn(conf)
-			if !stop {
-				time.Sleep(check.sleepTime)
+			if stop {
+				break
 			}
+			time.Sleep(check.sleepTime)
 		}
 
 		if !stop {
