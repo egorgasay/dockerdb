@@ -6,7 +6,10 @@ func With(ctx context.Context, c Config, fn func(c Config, vdb *VDB) error) (err
 	vdb, err := New(ctx, c)
 	if err != nil {
 		if vdb != nil {
-			return vdb.Clear(ctx)
+			err := vdb.Clear(ctx)
+			if err != nil {
+				return err
+			}
 		}
 		return err
 	}
