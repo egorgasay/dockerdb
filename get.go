@@ -29,3 +29,7 @@ func (c *Config) GetActualPort() nat.Port {
 func (c *Config) GetStandardDBPort() nat.Port {
 	return c.standardDBPort
 }
+
+func (ddb *VDB) GetSQLConnStr() string {
+	return ddb.connStr
+}
