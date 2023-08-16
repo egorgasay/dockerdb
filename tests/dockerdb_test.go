@@ -1,4 +1,4 @@
-package dockerdb_test
+package tests_test
 
 import (
 	"context"
