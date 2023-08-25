@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/docker/go-connections/nat"
 	"time"
 )
 
@@ -12,21 +11,6 @@ func (ddb *VDB) setup(ctx context.Context) error {
 	err := ddb.Run(ctx)
 	if err != nil {
 		return err
-	}
-
-	containerJSON, err := ddb.cli.ContainerInspect(context.Background(), ddb.id)
-	if err != nil {
-		panic(err)
-	}
-
-ports:
-	for _, bindings := range containerJSON.NetworkSettings.Ports {
-		for _, binding := range bindings {
-			if binding.HostPort != "" {
-				ddb.conf.actualPort = nat.Port(binding.HostPort)
-				break ports
-			}
-		}
 	}
 
 	if ddb.conf.noSQL {

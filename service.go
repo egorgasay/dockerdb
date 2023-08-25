@@ -94,7 +94,7 @@ inner:
 		for _, name := range container.Names {
 			if strings.Trim(name, "/") == conf.db.Name {
 				vdb.id = container.ID
-				conf.actualPort = nat.Port(strconv.Itoa(int(container.Ports[0].PublicPort)))
+				vdb.conf.actualPort = nat.Port(strconv.Itoa(int(container.Ports[0].PublicPort)))
 				break inner
 			}
 		}
@@ -112,7 +112,6 @@ inner:
 				return nil, err
 			}
 		}
-
 		err = vdb.init(ctx)
 		if err != nil {
 			return vdb, err
