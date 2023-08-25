@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
+	"github.com/docker/go-connections/nat"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -24,10 +26,13 @@ const (
 	Postgres12 DockerHubName = "postgres:12"
 	Postgres11 DockerHubName = "postgres:11"
 
-	MySQL5Image   DockerHubName = "mysql:5.7"
-	MySQL8Image   DockerHubName = "mysql:8"
-	KeyDBImage    DockerHubName = "eqalpha/keydb"
-	RedisImage    DockerHubName = "redis"
+	MySQL5Image DockerHubName = "mysql:5.7"
+	MySQL8Image DockerHubName = "mysql:8"
+
+	KeyDBImage DockerHubName = "eqalpha/keydb"
+
+	RedisImage DockerHubName = "redis"
+
 	ScyllaDBImage DockerHubName = "scylladb/scylla"
 )
 
@@ -63,13 +68,6 @@ func New(ctx context.Context, conf Config) (vdb *VDB, err error) {
 		return nil, err
 	}
 
-	if conf.actualPort == "" {
-		conf.actualPort, err = getFreePort()
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	cli, err := client.NewClientWithOpts(client.FromEnv,
 		client.WithAPIVersionNegotiation())
 	if err != nil {
@@ -96,6 +94,7 @@ inner:
 		for _, name := range container.Names {
 			if strings.Trim(name, "/") == conf.db.Name {
 				vdb.id = container.ID
+				conf.actualPort = nat.Port(strconv.Itoa(int(container.Ports[0].PublicPort)))
 				break inner
 			}
 		}
@@ -107,6 +106,13 @@ inner:
 			return vdb, err
 		}
 	} else {
+		if conf.actualPort == "" {
+			conf.actualPort, err = getFreePort()
+			if err != nil {
+				return nil, err
+			}
+		}
+
 		err = vdb.init(ctx)
 		if err != nil {
 			return vdb, err
