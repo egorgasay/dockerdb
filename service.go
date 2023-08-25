@@ -122,7 +122,7 @@ inner:
 		check := vdb.conf.checkWakeUp
 		var stop bool
 		for i := 0; i < check.tries; i++ {
-			stop = check.fn(conf)
+			stop = check.fn(vdb.conf)
 			if stop {
 				break
 			}
