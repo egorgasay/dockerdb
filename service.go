@@ -106,8 +106,8 @@ inner:
 			return vdb, err
 		}
 	} else {
-		if conf.actualPort == "" {
-			conf.actualPort, err = getFreePort()
+		if vdb.conf.actualPort == "" {
+			vdb.conf.actualPort, err = getFreePort()
 			if err != nil {
 				return nil, err
 			}
