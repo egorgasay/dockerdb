@@ -26,7 +26,7 @@ func TestPostgres15(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// defer vdb.Clear(ctx)
+	defer vdb.Clear(ctx)
 
 	var answer string
 	err = vdb.SQL().QueryRow("SELECT 'db is up'").Scan(&answer)
