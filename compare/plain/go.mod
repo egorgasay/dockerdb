@@ -1,10 +1,11 @@
-module github.com/egorgasay/dockerdb/v3
+module main
 
 go 1.21.0
 
 require (
 	github.com/docker/docker v24.0.5+incompatible
 	github.com/docker/go-connections v0.4.0
+	github.com/lib/pq v1.10.9
 )
 
 require (

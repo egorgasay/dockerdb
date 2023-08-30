@@ -42,8 +42,12 @@ const (
 )
 
 var (
-	maxWaitTime = 20 * time.Second
-	ErrUnknown  = errors.New("unknown error")
+	_maxActualPortTries = 7
+)
+
+var (
+	_maxWaitTime = 20 * time.Second
+	ErrUnknown   = errors.New("unknown error")
 )
 
 type VDB struct {
@@ -107,7 +111,12 @@ inner:
 		}
 	} else {
 		if vdb.conf.actualPort == "" {
-			vdb.conf.actualPort, err = getFreePort()
+			for i := 0; i < _maxActualPortTries; i++ {
+				vdb.conf.actualPort, err = getFreePort()
+				if err == nil {
+					break
+				}
+			}
 			if err != nil {
 				return nil, err
 			}

@@ -33,7 +33,7 @@ func (ddb *VDB) setup(ctx context.Context) error {
 }
 
 func (ddb *VDB) getDB(connStr string) (db *sql.DB, err error) {
-	after := time.After(maxWaitTime)
+	after := time.After(_maxWaitTime)
 	ticker := time.NewTicker(tryInterval)
 	var errPing error
 	for {

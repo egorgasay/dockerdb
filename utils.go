@@ -10,7 +10,11 @@ import (
 )
 
 func SetMaxWaitTime(sec time.Duration) {
-	maxWaitTime = sec
+	_maxWaitTime = sec
+}
+
+func SetMaxActualPortTries(n int) {
+	_maxActualPortTries = n
 }
 
 func getFreePort() (nat.Port, error) {
