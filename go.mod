@@ -1,6 +1,6 @@
 module github.com/egorgasay/dockerdb/v3
 
-go 1.21.0
+go 1.19
 
 require (
 	github.com/docker/docker v24.0.5+incompatible
