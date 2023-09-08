@@ -2,12 +2,15 @@ package dockerdb
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 )
 
 // Run launches the docker container.
+// Can return ErrWarning that must be not necessary to handle
 func (ddb *VDB) Run(ctx context.Context) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -17,6 +20,26 @@ func (ddb *VDB) Run(ctx context.Context) (err error) {
 
 	if err = ddb.cli.ContainerStart(ctx, ddb.id, types.ContainerStartOptions{}); err != nil {
 		return err
+	}
+
+	if ddb.conf.resources != nil {
+		ok, err := ddb.cli.ContainerUpdate(ctx, ddb.id, container.UpdateConfig{
+			Resources:     *ddb.conf.resources,
+			RestartPolicy: container.RestartPolicy{},
+		})
+
+		if err != nil {
+			return fmt.Errorf("container update error: %w", err)
+		}
+
+		if len(ok.Warnings) != 0 {
+			warnErrors := make([]error, len(ok.Warnings)+1)
+			warnErrors[0] = ErrWarning
+			for i, w := range ok.Warnings {
+				warnErrors[i+1] = fmt.Errorf("warning: %s", w)
+			}
+			return errors.Join(warnErrors...)
+		}
 	}
 
 	return nil

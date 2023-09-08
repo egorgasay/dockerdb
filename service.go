@@ -48,6 +48,7 @@ var (
 var (
 	_maxWaitTime = 20 * time.Second
 	ErrUnknown   = errors.New("unknown error")
+	ErrWarning   = errors.New("warning")
 )
 
 type VDB struct {

@@ -2,6 +2,7 @@ package dockerdb
 
 import (
 	"errors"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/go-connections/nat"
 	"strings"
 	"time"
@@ -120,6 +121,7 @@ type Config struct {
 	noSQL       bool
 	checkWakeUp checkWakeUp
 	pullImage   bool
+	resources   *container.Resources
 }
 
 type checkWakeUp struct {
@@ -206,6 +208,12 @@ func (c *Config) PullImage() *Config {
 // Build builds the config. After building, the config can be used and can't be changed.
 func (c *Config) Build() Config {
 	return *c
+}
+
+// LimitResources limits the resources of the container.
+func (c *Config) LimitResources(resources *container.Resources) *Config {
+	c.resources = resources
+	return c
 }
 
 func validate(c Config) error {
