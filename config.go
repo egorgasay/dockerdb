@@ -122,6 +122,7 @@ type Config struct {
 	checkWakeUp checkWakeUp
 	pullImage   bool
 	resources   *container.Resources
+	cmd         []string
 }
 
 type checkWakeUp struct {
@@ -213,6 +214,11 @@ func (c *Config) Build() Config {
 // LimitResources limits the resources of the container.
 func (c *Config) LimitResources(resources *container.Resources) *Config {
 	c.resources = resources
+	return c
+}
+
+func (c *Config) Cmd(cmd []string) *Config {
+	c.cmd = cmd
 	return c
 }
 

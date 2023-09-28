@@ -59,6 +59,7 @@ func (ddb *VDB) init(ctx context.Context) error {
 		ExposedPorts: map[nat.Port]struct{}{
 			portDocker: struct{}{},
 		},
+		Cmd: ddb.conf.cmd,
 	}, hostConfig, nil, nil, containerName)
 	if err != nil {
 		split := strings.Split(err.Error(), `"`)
