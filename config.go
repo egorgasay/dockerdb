@@ -200,9 +200,13 @@ func (c *Config) SQL() *Config {
 	return c
 }
 
-// PullImage pulls the vendor image.
 func (c *Config) PullImage() *Config {
 	c.pullImage = true
+	return c
+}
+
+func (c *Config) SetPullImage(pull bool) *Config {
+	c.pullImage = pull
 	return c
 }
 
