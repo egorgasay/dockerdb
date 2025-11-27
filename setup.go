@@ -44,7 +44,12 @@ func (ddb *VDB) getDB(connStr string) (db *sql.DB, err error) {
 			}
 			return nil, fmt.Errorf("timeout, Last error:%w", err)
 		default:
-			db, err = sql.Open(ddb.conf.vendorName, connStr)
+			driver := ddb.conf.driver
+			if driver == "" {
+				driver = ddb.conf.vendorName
+			}
+			
+			db, err = sql.Open(driver, connStr)
 			if db == nil {
 				return nil, fmt.Errorf("db is nil %w", err)
 			}

@@ -2,10 +2,11 @@ package dockerdb
 
 import (
 	"errors"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/go-connections/nat"
 	"strings"
 	"time"
+
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/go-connections/nat"
 )
 
 func EmptyConfig() *Config {
@@ -113,6 +114,7 @@ type Config struct {
 	standardDBPort nat.Port
 	vendor         DockerHubName
 	vendorName     string
+	driver         string
 
 	// Optional
 	actualPort  nat.Port
@@ -152,6 +154,12 @@ func (c *Config) DBPassword(password string) *Config {
 // Vendor sets the vendor of the database.
 func (c *Config) Vendor(vendor DockerHubName) *Config {
 	c.vendor = vendor
+	return c
+}
+
+// Driver sets the driver for the database.
+func (c *Config) Driver(driver string) *Config {
+	c.driver = driver
 	return c
 }
 
